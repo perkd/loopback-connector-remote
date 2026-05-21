@@ -15,3 +15,8 @@ coverage
 *.tgz
 *.xml
 *._*
+
+# Yarn 4 (nodeLinker: node-modules — cache is reproducible from yarn.lock)
+.yarn/cache
+.yarn/install-state.gz
+.pnp.*
