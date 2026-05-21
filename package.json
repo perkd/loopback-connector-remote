@@ -1,7 +1,8 @@
 {
   "name": "loopback-connector-remote",
-  "version": "3.4.1",
+  "version": "3.5.0",
   "description": "Remote REST API connector for Loopback",
+  "author": "IBM Corp.",
   "main": "lib/remote-connector.js",
   "keywords": [
     "web",
@@ -9,14 +10,14 @@
     "rest",
     "StrongLoop"
   ],
-  "scripts": {
-    "test": "grunt",
-    "posttest": "npm run lint",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
-  },
   "engines": {
-    "node": ">=8"
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test --test-force-exit --test-reporter=spec --experimental-test-coverage 'test/*.test.js' 'test/integration/*.js'",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "reinstall": "rm -rf node_modules yarn.lock && yarn install"
   },
   "repository": {
     "type": "git",
@@ -32,23 +33,16 @@
   },
   "homepage": "http://loopback.io",
   "dependencies": {
-    "loopback-datasource-juggler": "^3.0.0",
-    "strong-remoting": "^3.15.0"
+    "loopback-datasource-juggler": "github:perkd/loopback-datasource-juggler#semver:^5.2.11",
+    "strong-remoting": "github:perkd/strong-remoting#semver:^3.21.0"
   },
   "devDependencies": {
-    "assert": "^1.4.1",
-    "bluebird": "^3.5.1",
-    "eslint": "^6.5.1",
-    "eslint-config-loopback": "^13.1.0",
-    "grunt": "^1.0.3",
-    "grunt-cli": "^1.2.0",
-    "grunt-mocha-test": "^0.13.3",
-    "loopback": "^3.0.0",
-    "mocha": "^5.2.0",
-    "sinon": "^6.0.0",
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.4.0",
+    "globals": "^17.6.0",
+    "loopback": "github:perkd/loopback#semver:^3.35.6",
+    "sinon": "^22.0.0",
     "strong-task-emitter": "^0.0.8"
   },
-  "optionalDependencies": {},
-  "author": "IBM Corp."
   "packageManager": "yarn@4.15.0"
 }
