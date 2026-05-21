@@ -136,6 +136,91 @@ describe('Custom Path', function() {
   });
 });
 
+describe('ObjectId coercion for string args', function() {
+  let serverApp, clientApp, ServerModel, ClientModel;
+
+  before(function setupServer(done) {
+    const app = serverApp = helper.createRestAppAndListen();
+    const db = helper.createMemoryDataSource(app);
+
+    ServerModel = app.registry.createModel({name: 'TestModel'});
+    ServerModel.endSession = function(machineId, orderId, cb) {
+      cb(null, {receivedMachineId: machineId, receivedOrderId: orderId});
+    };
+    ServerModel.remoteMethod('endSession', {
+      accepts: [
+        {arg: 'machineId', type: 'string', required: true},
+        {arg: 'orderId', type: 'string', required: true},
+      ],
+      returns: {type: 'object', root: true},
+      http: {verb: 'post', path: '/end-session'},
+    });
+    app.model(ServerModel, {dataSource: db});
+
+    app.locals.handler.on('listening', function() { done(); });
+  });
+
+  before(function setupRemoteClient() {
+    const app = clientApp = loopback({localRegistry: true});
+    const remoteDs = helper.createRemoteDataSource(clientApp, serverApp);
+
+    ClientModel = app.registry.createModel({name: 'TestModel'});
+    ClientModel.remoteMethod('endSession', {
+      accepts: [
+        {arg: 'machineId', type: 'string', required: true},
+        {arg: 'orderId', type: 'string', required: true},
+      ],
+      returns: {type: 'object', root: true},
+      http: {verb: 'post', path: '/end-session'},
+    });
+    app.model(ClientModel, {dataSource: remoteDs});
+  });
+
+  after(function() {
+    serverApp.locals.handler.close();
+    ServerModel = null;
+    ClientModel = null;
+  });
+
+  it('should coerce ObjectId-like args to hex strings for string params', function(done) {
+    const machineObjectId = {
+      toHexString: function() { return '66cd41bc565b9600110e1272'; },
+      toString: function() { return '66cd41bc565b9600110e1272'; },
+    };
+    const orderObjectId = {
+      toHexString: function() { return '6a0eb6847bee16983fec880a'; },
+      toString: function() { return '6a0eb6847bee16983fec880a'; },
+    };
+
+    ClientModel.endSession(machineObjectId, orderObjectId, function(err, result) {
+      if (err) return done(err);
+      assert.strictEqual(result.receivedMachineId, '66cd41bc565b9600110e1272');
+      assert.strictEqual(result.receivedOrderId, '6a0eb6847bee16983fec880a');
+      done();
+    });
+  });
+
+  it('should pass through plain strings unchanged', function(done) {
+    ClientModel.endSession('plain-mid', 'plain-oid', function(err, result) {
+      if (err) return done(err);
+      assert.strictEqual(result.receivedMachineId, 'plain-mid');
+      assert.strictEqual(result.receivedOrderId, 'plain-oid');
+      done();
+    });
+  });
+
+  it('should NOT coerce plain objects (no toHexString) — strong-remoting drops them', function(done) {
+    // A plain object as a string arg: isAcceptable rejects it, so the body
+    // never contains machineId, and the server returns the "required" error.
+    ClientModel.endSession({foo: 'bar'}, 'oid', function(err) {
+      assert(err, 'expected validation error');
+      assert(/machineId is a required argument/.test(err.message),
+        'plain objects should NOT be silently coerced');
+      done();
+    });
+  });
+});
+
 describe('RemoteConnector with options', () => {
   it('should have the remoting options passed to the remote object', () => {
     const app = loopback();
