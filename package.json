@@ -50,4 +50,5 @@
   },
   "optionalDependencies": {},
   "author": "IBM Corp."
+  "packageManager": "yarn@4.15.0"
 }
