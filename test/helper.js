@@ -5,7 +5,6 @@
 
 'use strict';
 
-const extend = require('util')._extend;
 const loopback = require('loopback');
 const remoteConnector = require('..');
 
@@ -28,6 +27,7 @@ function createRestAppAndListen() {
 
   app.use(loopback.rest());
   app.locals.handler = app.listen();
+  app.locals.handler.unref();
 
   return app;
 }

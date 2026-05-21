@@ -5,6 +5,7 @@
 
 'use strict';
 
+const {describe, it, beforeEach, afterEach} = require('node:test');
 const helper = require('./helper');
 const loopback = require('loopback');
 const sinon = require('sinon');
@@ -15,19 +16,17 @@ const RelationTypes = relation.RelationTypes;
 describe('Models Define Type Tests', function() {
   let serverApp, clientApp, remoteDs, defineObjectTypeSpy, ChildModel;
 
-  beforeEach('create remote datasource', () => {
+  beforeEach(() => {
     serverApp = helper.createRestAppAndListen();
     clientApp = loopback({localRegistry: true});
     remoteDs = helper.createRemoteDataSource(clientApp, serverApp);
-  });
-
-  beforeEach('spy remote connector', () => {
     defineObjectTypeSpy = sinon.spy(remoteDs.connector.remotes,
       'defineObjectType');
   });
 
-  afterEach('restore remote connector', () => {
+  afterEach(() => {
     defineObjectTypeSpy.restore();
+    serverApp.locals.handler.close();
   });
 
   it('should define a type of a remote model only once (no relations)', () => {
@@ -42,7 +41,7 @@ describe('Models Define Type Tests', function() {
   });
 
   describe('when a child model is created', () => {
-    beforeEach('create a child model', () => {
+    beforeEach(() => {
       ChildModel = clientApp.registry.createModel({
         name: 'ChildModel',
       });

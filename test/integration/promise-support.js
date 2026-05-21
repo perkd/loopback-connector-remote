@@ -5,60 +5,47 @@
 
 'use strict';
 
-const assert = require('assert');
+const {describe, it, before, after} = require('node:test');
+const assert = require('node:assert');
 const helper = require('../helper');
-const Promise = require('bluebird');
 
-let globalPromiseSetManually = false;
-let User;
+let app, User;
 
 describe('promise support', function() {
-  before(setGlobalPromise);
-  before(createUserModel);
-  after(resetGlobalPromise);
+  before(function() {
+    app = helper.createRestAppAndListen();
+    const db = helper.createMemoryDataSource(app);
 
-  context('create', function() {
+    User = app.registry.createModel({
+      name: 'user',
+      properties: helper.getUserProperties(),
+      options: {forceId: false},
+    });
+    app.model(User, {dataSource: db});
+  });
+
+  after(function() {
+    app.locals.handler.close();
+  });
+
+  describe('create', function() {
     it('supports promises', function() {
       const retval = User.create();
       assert(retval && typeof retval.then === 'function');
     });
   });
 
-  context('find', function() {
+  describe('find', function() {
     it('supports promises', function() {
       const retval = User.find();
       assert(retval && typeof retval.then === 'function');
     });
   });
 
-  context('findById', function() {
+  describe('findById', function() {
     it('supports promises', function() {
       const retval = User.findById(1);
       assert(retval && typeof retval.then === 'function');
     });
   });
 });
-
-function setGlobalPromise() {
-  if (!global.Promise) {
-    global.Promise = Promise;
-    globalPromiseSetManually = true;
-  }
-}
-
-function createUserModel() {
-  const app = helper.createRestAppAndListen();
-  const db = helper.createMemoryDataSource(app);
-
-  User = app.registry.createModel({
-    name: 'user',
-    properties: helper.getUserProperties(),
-    options: {forceId: false},
-  });
-  app.model(User, {dataSource: db});
-}
-
-function resetGlobalPromise() {
-  if (globalPromiseSetManually)
-    global.Promise = undefined;
-}

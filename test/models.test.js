@@ -5,16 +5,16 @@
 
 'use strict';
 
-const assert = require('assert');
+const {describe, it, beforeEach, afterEach} = require('node:test');
+const assert = require('node:assert');
 const helper = require('./helper');
-const loopback = require('loopback');
 const TaskEmitter = require('strong-task-emitter');
 
 describe('Model tests', function() {
-  let User;
+  let app, User;
 
   beforeEach(function() {
-    const app = helper.createRestAppAndListen();
+    app = helper.createRestAppAndListen();
     const db = helper.createMemoryDataSource(app);
 
     User = app.registry.createModel({
@@ -23,6 +23,10 @@ describe('Model tests', function() {
       options: {forceId: false},
     });
     app.model(User, {dataSource: db});
+  });
+
+  afterEach(function() {
+    app.locals.handler.close();
   });
 
   describe('Model.validatesPresenceOf(properties...)', function() {
@@ -69,7 +73,6 @@ describe('Model tests', function() {
       assert(bat.isValid() === false);
       assert(foo.errors.domain, 'model should have a domain error');
       assert(bat.errors.domain, 'model should have a domain error');
-      assert(bat.errors.domain, 'model should have a domain error');
     });
   });
 
@@ -94,148 +97,120 @@ describe('Model tests', function() {
       assert(user.errors.age, 'model should have age error');
     });
 
-    it('should validate the model asynchronously', function(done) {
+    it('should validate the model asynchronously', async function() {
       User.validatesNumericalityOf('age', {int: true});
       const user = new User({first: 'joe', age: 'flarg'});
-      user.isValid(function(valid) {
-        assert(valid === false);
-        assert(user.errors.age, 'model should have age error');
-        done();
-      });
+      const valid = await new Promise((resolve) => user.isValid(resolve));
+      assert(valid === false);
+      assert(user.errors.age, 'model should have age error');
     });
   });
 
   describe('Model.create([data], [callback])', function() {
     it('should create an instance and save to the attached data source',
-      function(done) {
-        User.create({first: 'Joe', last: 'Bob'}, function(err, user) {
-          if (err) return done(err);
-          assert(user instanceof User);
-          done();
-        });
+      async function() {
+        const user = await User.create({first: 'Joe', last: 'Bob'});
+        assert(user instanceof User);
       });
   });
 
   describe('model.save([options], [callback])', function() {
     it('should save an instance of a Model to the attached data source',
-      function(done) {
+      async function() {
         const joe = new User({first: 'Joe', last: 'Bob'});
-        joe.save(function(err, user) {
-          if (err) return done(err);
-          assert(user.id);
-          assert(!user.errors);
-          done();
-        });
+        const user = await joe.save();
+        assert(user.id);
+        assert(!user.errors);
       });
   });
 
   describe('model.updateAttributes(data, [callback])', function() {
     it('should save specified attributes to the attached data source',
-      function(done) {
-        User.create({first: 'joe', age: 100}, function(err, user) {
-          if (err) return done(err);
-          assert.equal(user.first, 'joe');
+      async function() {
+        const user = await User.create({first: 'joe', age: 100});
+        assert.equal(user.first, 'joe');
 
+        const updatedUser = await new Promise((resolve, reject) => {
           user.updateAttributes({
             first: 'updatedFirst',
             last: 'updatedLast',
-          }, function(err, updatedUser) {
-            if (err) return done(err);
-            assert.equal(updatedUser.first, 'updatedFirst');
-            assert.equal(updatedUser.last, 'updatedLast');
-            assert.equal(updatedUser.age, 100);
-            done();
-          });
+          }, (err, u) => err ? reject(err) : resolve(u));
         });
+        assert.equal(updatedUser.first, 'updatedFirst');
+        assert.equal(updatedUser.last, 'updatedLast');
+        assert.equal(updatedUser.age, 100);
       });
   });
 
   describe('Model.upsert(data, callback)', function() {
     it('should update when a record with id=data.id is found, insert otherwise',
-      function(done) {
-        User.upsert({first: 'joe', id: 7}, function(err, user) {
-          if (err) return done(err);
-          assert.equal(user.first, 'joe');
-
-          User.upsert({first: 'bob', id: 7}, function(err, updatedUser) {
-            if (err) return done(err);
-            assert.equal(updatedUser.first, 'bob');
-            done();
-          });
+      async function() {
+        const user = await new Promise((resolve, reject) => {
+          User.upsert({first: 'joe', id: 7}, (err, u) => err ? reject(err) : resolve(u));
         });
+        assert.equal(user.first, 'joe');
+
+        const updatedUser = await new Promise((resolve, reject) => {
+          User.upsert({first: 'bob', id: 7}, (err, u) => err ? reject(err) : resolve(u));
+        });
+        assert.equal(updatedUser.first, 'bob');
       });
   });
 
   describe('model.destroy([callback])', function() {
-    it('should remove a model from the attached data source', function(done) {
-      User.create({first: 'joe', last: 'bob'}, function(err, user) {
-        if (err) return done(err);
-        User.findById(user.id, function(err, foundUser) {
-          if (err) return done(err);
-          assert.equal(user.id, foundUser.id);
-          foundUser.destroy(function(err) {
-            if (err) return done(err);
-            User.findById(user.id, function(err, notFound) {
-              if (err) return done(err);
-              assert.equal(notFound, null);
-              done();
-            });
-          });
-        });
+    it('should remove a model from the attached data source', async function() {
+      const user = await User.create({first: 'joe', last: 'bob'});
+      const foundUser = await User.findById(user.id);
+      assert.equal(user.id, foundUser.id);
+      await new Promise((resolve, reject) => {
+        foundUser.destroy((err) => err ? reject(err) : resolve());
       });
+      const notFound = await User.findById(user.id);
+      assert.equal(notFound, null);
     });
   });
 
   describe('Model.deleteById(id, [callback])', function() {
     it('should delete a model instance from the attached data source',
-      function(done) {
-        User.create({first: 'joe', last: 'bob'}, function(err, user) {
-          if (err) return done(err);
-          User.deleteById(user.id, function(err) {
-            if (err) return done(err);
-            User.findById(user.id, function(err, notFound) {
-              if (err) return done(err);
-              assert.equal(notFound, null);
-              done();
-            });
-          });
+      async function() {
+        const user = await User.create({first: 'joe', last: 'bob'});
+        await new Promise((resolve, reject) => {
+          User.deleteById(user.id, (err) => err ? reject(err) : resolve());
         });
+        const notFound = await User.findById(user.id);
+        assert.equal(notFound, null);
       });
   });
 
   describe('Model.findById(id, callback)', function() {
-    it('should find an instance by id', function(done) {
-      User.create({first: 'michael', last: 'jordan', id: 23}, function(err) {
-        if (err) return done(err);
-        User.findById(23, function(err, user) {
-          if (err) return done(err);
-          assert(user, 'user should have been found');
-          assert.equal(user.id, 23);
-          assert.equal(user.first, 'michael');
-          assert.equal(user.last, 'jordan');
-          done();
-        });
-      });
+    it('should find an instance by id', async function() {
+      await User.create({first: 'michael', last: 'jordan', id: 23});
+      const user = await User.findById(23);
+      assert(user, 'user should have been found');
+      assert.equal(user.id, 23);
+      assert.equal(user.first, 'michael');
+      assert.equal(user.last, 'jordan');
     });
   });
 
   describe('Model.count([query], callback)', function() {
     it('should return the count of Model instances in data source',
-      function(done) {
-        const taskEmitter = new TaskEmitter();
-        taskEmitter
-          .task(User, 'create', {first: 'jill', age: 100})
-          .task(User, 'create', {first: 'bob', age: 200})
-          .task(User, 'create', {first: 'jan'})
-          .task(User, 'create', {first: 'sam'})
-          .task(User, 'create', {first: 'suzy'})
-          .on('done', function() {
-            User.count({age: {gt: 99}}, function(err, count) {
-              if (err) return done(err);
-              assert.equal(count, 2);
-              done();
-            });
-          });
+      async function() {
+        await new Promise((resolve, reject) => {
+          const taskEmitter = new TaskEmitter();
+          taskEmitter
+            .task(User, 'create', {first: 'jill', age: 100})
+            .task(User, 'create', {first: 'bob', age: 200})
+            .task(User, 'create', {first: 'jan'})
+            .task(User, 'create', {first: 'sam'})
+            .task(User, 'create', {first: 'suzy'})
+            .on('done', resolve)
+            .on('error', reject);
+        });
+        const count = await new Promise((resolve, reject) => {
+          User.count({age: {gt: 99}}, (err, c) => err ? reject(err) : resolve(c));
+        });
+        assert.equal(count, 2);
       });
   });
 });

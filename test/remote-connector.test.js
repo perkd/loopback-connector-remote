@@ -5,14 +5,15 @@
 
 'use strict';
 
-const assert = require('assert');
+const {describe, it, before, after} = require('node:test');
+const assert = require('node:assert');
 const helper = require('./helper');
 const loopback = require('loopback');
 
 describe('RemoteConnector', function() {
   let serverApp, clientApp, ServerModel, ClientModel;
 
-  before(function setupServer(done) {
+  before(async function() {
     const app = serverApp = helper.createRestAppAndListen();
     const db = helper.createMemoryDataSource(app);
 
@@ -21,17 +22,15 @@ describe('RemoteConnector', function() {
     });
     app.model(ServerModel, {dataSource: db});
 
-    app.locals.handler.on('listening', function() { done(); });
-  });
+    await new Promise((resolve) => app.locals.handler.on('listening', resolve));
 
-  before(function setupRemoteClient() {
-    const app = clientApp = loopback({localRegistry: true});
+    clientApp = loopback({localRegistry: true});
     const remoteDs = helper.createRemoteDataSource(clientApp, serverApp);
 
-    ClientModel = app.registry.createModel({
+    ClientModel = clientApp.registry.createModel({
       name: 'TestModel',
     });
-    app.model(ClientModel, {dataSource: remoteDs});
+    clientApp.model(ClientModel, {dataSource: remoteDs});
   });
 
   after(function() {
@@ -40,14 +39,13 @@ describe('RemoteConnector', function() {
     ClientModel = null;
   });
 
-  it('should support the save method', function(done) {
+  it('should support the save method', async function() {
     let calledServerCreate = false;
 
     ServerModel.create = function(data, options, cb, callback) {
       if (typeof options === 'function') {
         callback = cb;
         cb = options;
-        options = {};
       }
 
       calledServerCreate = true;
@@ -57,42 +55,37 @@ describe('RemoteConnector', function() {
     };
 
     const m = new ClientModel({foo: 'bar'});
-    m.save(function(err, instance) {
-      if (err) return done(err);
-      assert(instance);
-      assert(instance instanceof ClientModel);
-      assert(calledServerCreate);
-      done();
-    });
+    const instance = await m.save();
+    assert(instance);
+    assert(instance instanceof ClientModel);
+    assert(calledServerCreate);
   });
 
-  it('should support aliases', function(done) {
+  it('should support aliases', async function() {
     let calledServerUpsert = false;
     ServerModel.patchOrCreate =
     ServerModel.upsert = function(id, options, cb) {
       if (typeof options === 'function') {
         cb = options;
-        options = {};
       }
 
       calledServerUpsert = true;
       cb();
     };
 
-    ClientModel.updateOrCreate({}, function(err, instance) {
-      if (err) return done(err);
-      assert(instance);
-      assert(instance instanceof ClientModel);
-      assert(calledServerUpsert, 'server upsert should have been called');
-      done();
+    const instance = await new Promise((resolve, reject) => {
+      ClientModel.updateOrCreate({}, (err, u) => err ? reject(err) : resolve(u));
     });
+    assert(instance);
+    assert(instance instanceof ClientModel);
+    assert(calledServerUpsert, 'server upsert should have been called');
   });
 });
 
 describe('Custom Path', function() {
   let serverApp, clientApp, ServerModel, ClientModel;
 
-  before(function setupServer(done) {
+  before(async function() {
     const app = serverApp = helper.createRestAppAndListen();
     const db = helper.createMemoryDataSource(app);
 
@@ -104,21 +97,19 @@ describe('Custom Path', function() {
     });
     app.model(ServerModel, {dataSource: db});
 
-    serverApp.locals.handler.on('listening', function() { done(); });
-  });
+    await new Promise((resolve) => serverApp.locals.handler.on('listening', resolve));
 
-  before(function setupRemoteClient() {
-    const app = clientApp = loopback({localRegistry: true});
+    clientApp = loopback({localRegistry: true});
     const remoteDs = helper.createRemoteDataSource(clientApp, serverApp);
 
-    ClientModel = app.registry.createModel({
+    ClientModel = clientApp.registry.createModel({
       name: 'TestModel',
       options: {
         dataSource: 'remote',
         http: {path: '/custom'},
       },
     });
-    app.model(ClientModel, {dataSource: remoteDs});
+    clientApp.model(ClientModel, {dataSource: remoteDs});
   });
 
   after(function() {
@@ -127,19 +118,16 @@ describe('Custom Path', function() {
     ClientModel = null;
   });
 
-  it('should support http.path configuration', function(done) {
-    ClientModel.create({}, function(err, instance) {
-      if (err) return done(err);
-      assert(instance);
-      done();
-    });
+  it('should support http.path configuration', async function() {
+    const instance = await ClientModel.create({});
+    assert(instance);
   });
 });
 
 describe('ObjectId coercion for string args', function() {
   let serverApp, clientApp, ServerModel, ClientModel;
 
-  before(function setupServer(done) {
+  before(async function() {
     const app = serverApp = helper.createRestAppAndListen();
     const db = helper.createMemoryDataSource(app);
 
@@ -157,14 +145,12 @@ describe('ObjectId coercion for string args', function() {
     });
     app.model(ServerModel, {dataSource: db});
 
-    app.locals.handler.on('listening', function() { done(); });
-  });
+    await new Promise((resolve) => app.locals.handler.on('listening', resolve));
 
-  before(function setupRemoteClient() {
-    const app = clientApp = loopback({localRegistry: true});
+    clientApp = loopback({localRegistry: true});
     const remoteDs = helper.createRemoteDataSource(clientApp, serverApp);
 
-    ClientModel = app.registry.createModel({name: 'TestModel'});
+    ClientModel = clientApp.registry.createModel({name: 'TestModel'});
     ClientModel.remoteMethod('endSession', {
       accepts: [
         {arg: 'machineId', type: 'string', required: true},
@@ -173,7 +159,7 @@ describe('ObjectId coercion for string args', function() {
       returns: {type: 'object', root: true},
       http: {verb: 'post', path: '/end-session'},
     });
-    app.model(ClientModel, {dataSource: remoteDs});
+    clientApp.model(ClientModel, {dataSource: remoteDs});
   });
 
   after(function() {
@@ -182,7 +168,7 @@ describe('ObjectId coercion for string args', function() {
     ClientModel = null;
   });
 
-  it('should coerce ObjectId-like args to hex strings for string params', function(done) {
+  it('should coerce ObjectId-like args to hex strings for string params', async function() {
     const machineObjectId = {
       toHexString: function() { return '66cd41bc565b9600110e1272'; },
       toString: function() { return '66cd41bc565b9600110e1272'; },
@@ -192,32 +178,30 @@ describe('ObjectId coercion for string args', function() {
       toString: function() { return '6a0eb6847bee16983fec880a'; },
     };
 
-    ClientModel.endSession(machineObjectId, orderObjectId, function(err, result) {
-      if (err) return done(err);
-      assert.strictEqual(result.receivedMachineId, '66cd41bc565b9600110e1272');
-      assert.strictEqual(result.receivedOrderId, '6a0eb6847bee16983fec880a');
-      done();
+    const result = await new Promise((resolve, reject) => {
+      ClientModel.endSession(machineObjectId, orderObjectId, (err, r) => err ? reject(err) : resolve(r));
     });
+    assert.strictEqual(result.receivedMachineId, '66cd41bc565b9600110e1272');
+    assert.strictEqual(result.receivedOrderId, '6a0eb6847bee16983fec880a');
   });
 
-  it('should pass through plain strings unchanged', function(done) {
-    ClientModel.endSession('plain-mid', 'plain-oid', function(err, result) {
-      if (err) return done(err);
-      assert.strictEqual(result.receivedMachineId, 'plain-mid');
-      assert.strictEqual(result.receivedOrderId, 'plain-oid');
-      done();
+  it('should pass through plain strings unchanged', async function() {
+    const result = await new Promise((resolve, reject) => {
+      ClientModel.endSession('plain-mid', 'plain-oid', (err, r) => err ? reject(err) : resolve(r));
     });
+    assert.strictEqual(result.receivedMachineId, 'plain-mid');
+    assert.strictEqual(result.receivedOrderId, 'plain-oid');
   });
 
-  it('should NOT coerce plain objects (no toHexString) — strong-remoting drops them', function(done) {
+  it('should NOT coerce plain objects (no toHexString) — strong-remoting drops them', async function() {
     // A plain object as a string arg: isAcceptable rejects it, so the body
     // never contains machineId, and the server returns the "required" error.
-    ClientModel.endSession({foo: 'bar'}, 'oid', function(err) {
-      assert(err, 'expected validation error');
-      assert(/machineId is a required argument/.test(err.message),
-        'plain objects should NOT be silently coerced');
-      done();
+    const err = await new Promise((resolve) => {
+      ClientModel.endSession({foo: 'bar'}, 'oid', (e) => resolve(e));
     });
+    assert(err, 'expected validation error');
+    assert(/machineId is a required argument/.test(err.message),
+      'plain objects should NOT be silently coerced');
   });
 });
 
