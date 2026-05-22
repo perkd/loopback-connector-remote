@@ -2181,15 +2181,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"loopback-connector-remote@npm:^3.4.1, loopback-connector-remote@workspace:.":
+"loopback-connector-remote@github:perkd/loopback-connector-remote#semver:^3.5.0":
+  version: 3.5.0
+  resolution: "loopback-connector-remote@https://github.com/perkd/loopback-connector-remote.git#commit=d9cfd8be0192ae279a3cb544d9c47f688dffeeac"
+  dependencies:
+    loopback-datasource-juggler: "github:perkd/loopback-datasource-juggler#semver:^5.2.11"
+    strong-remoting: "github:perkd/strong-remoting#semver:^3.21.0"
+  checksum: 10/415349c17e427fc425606a6ab450a3fca05d99f0cab37b3203d19d89a517f60c7435b9af8aef5ca46f7772d2eb08af633fd5e6ab4e11ad0e241fe51fc9dd41fb
+  languageName: node
+  linkType: hard
+
+"loopback-connector-remote@workspace:.":
   version: 0.0.0-use.local
   resolution: "loopback-connector-remote@workspace:."
   dependencies:
     "@eslint/js": "npm:^10.0.1"
     eslint: "npm:^10.4.0"
     globals: "npm:^17.6.0"
-    loopback: "github:perkd/loopback#semver:^3.35.6"
-    loopback-datasource-juggler: "github:perkd/loopback-datasource-juggler#semver:^5.2.11"
+    loopback: "github:perkd/loopback#semver:^3.36.1"
+    loopback-datasource-juggler: "github:perkd/loopback-datasource-juggler#semver:^6.0.0"
     sinon: "npm:^22.0.0"
     strong-remoting: "github:perkd/strong-remoting#semver:^3.21.0"
     strong-task-emitter: "npm:^0.0.8"
@@ -2210,9 +2220,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"loopback-datasource-juggler@github:perkd/loopback-datasource-juggler#semver:^5.2.11, loopback-datasource-juggler@github:perkd/loopback-datasource-juggler#semver:^5.2.9":
-  version: 5.2.11
-  resolution: "loopback-datasource-juggler@https://github.com/perkd/loopback-datasource-juggler.git#commit=f05945b9420dd6951ca148cc03172756fc7060c8"
+"loopback-datasource-juggler@github:perkd/loopback-datasource-juggler#semver:^5.2.11, loopback-datasource-juggler@github:perkd/loopback-datasource-juggler#semver:^5.2.12":
+  version: 5.2.12
+  resolution: "loopback-datasource-juggler@https://github.com/perkd/loopback-datasource-juggler.git#commit=41aef2a1c7c300fbe226e9799d76987b5f481d87"
   dependencies:
     async: "npm:^3.2.6"
     change-case: "npm:5.4.4"
@@ -2227,7 +2237,27 @@ __metadata:
     qs: "npm:^6.15.2"
     strong-globalize: "npm:^6.0.6"
     uuid: "npm:^11.1.0"
-  checksum: 10/ae6bccbb276060d915860176177393b14265992c0696daf5da1c8035e6745f99d1959169a60f8fd2772fe8ce6ac382da9c96bbfd58356653c809860ae0ae3533
+  checksum: 10/33fcc715bb346e1fd6ab0be7036063236dbf481b5f1613cdb6c49d2e803a6c1416c4ce23c711bd6d2514492e3edd502760e4d7a13567eb62f26251eefdac2e4a
+  languageName: node
+  linkType: hard
+
+"loopback-datasource-juggler@github:perkd/loopback-datasource-juggler#semver:^6.0.0":
+  version: 6.0.0
+  resolution: "loopback-datasource-juggler@https://github.com/perkd/loopback-datasource-juggler.git#commit=0d23667303a5cf3aae5fc8e929b478de4fa6f4f6"
+  dependencies:
+    async: "npm:^3.2.6"
+    change-case: "npm:5.4.4"
+    debug: "npm:^4.4.3"
+    depd: "npm:^2.0.0"
+    inflection: "npm:^3.0.2"
+    loopback-connector: "npm:^7.0.6"
+    minimatch: "npm:^10.2.5"
+    nanoid: "npm:3.3.12"
+    neotraverse: "npm:^0.6.18"
+    qs: "npm:^6.15.2"
+    strong-globalize: "npm:^6.0.6"
+    uuid: "npm:11.1.0"
+  checksum: 10/4da67432edc7b9b297d3804675b953781845166ae35e0a8e95daf780d36ebd01e2c984fd4243ab435f66e6838eaa351d4919e15e1eeac15b9b3f10c961ef5e24
   languageName: node
   linkType: hard
 
@@ -2258,9 +2288,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"loopback@github:perkd/loopback#semver:^3.35.6":
-  version: 3.35.6
-  resolution: "loopback@https://github.com/perkd/loopback.git#commit=81ee295cc2515b3930536eca749f393de2d2db54"
+"loopback@github:perkd/loopback#semver:^3.36.1":
+  version: 3.36.1
+  resolution: "loopback@https://github.com/perkd/loopback.git#commit=d9d681360ba545ab9847ff5448337705fb9f4497"
   dependencies:
     bcryptjs: "npm:^3.0.3"
     body-parser: "npm:^2.2.2"
@@ -2271,8 +2301,8 @@ __metadata:
     fast-json-stable-stringify: "npm:^2.1.0"
     inflection: "npm:2.0.1"
     isemail: "npm:^3.2.0"
-    loopback-connector-remote: "npm:^3.4.1"
-    loopback-datasource-juggler: "github:perkd/loopback-datasource-juggler#semver:^5.2.9"
+    loopback-connector-remote: "github:perkd/loopback-connector-remote#semver:^3.5.0"
+    loopback-datasource-juggler: "github:perkd/loopback-datasource-juggler#semver:^5.2.12"
     loopback-filters: "npm:^1.1.1"
     loopback-phase: "npm:3.4.0"
     nodemailer: "npm:^8.0.7"
@@ -2281,10 +2311,10 @@ __metadata:
     serve-favicon: "npm:^2.5.1"
     stable: "npm:^0.1.8"
     strong-globalize: "npm:^6.0.6"
-    strong-remoting: "github:perkd/strong-remoting#semver:^3.20.3"
+    strong-remoting: "github:perkd/strong-remoting#semver:^3.21.0"
     uid2: "npm:1.0.0"
     underscore.string: "npm:^3.3.6"
-  checksum: 10/613edd150f119dd31e76f5ff17bbc12b19c3c748349fa6330cc478f2b82c2daa5459a3c8303d118afd53d2e65db96e36843828855aa12cc9b74ede2322b378b2
+  checksum: 10/16e6d9430a42f14e61d67e11250a9824ab4430fdce47a248c42342bca8e6d907ef2e4918fcad944b424cb404d0573ce89a473e9f5227b7b6a61ae2e9150218e3
   languageName: node
   linkType: hard
 
@@ -3360,7 +3390,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"strong-remoting@github:perkd/strong-remoting#semver:^3.20.3, strong-remoting@github:perkd/strong-remoting#semver:^3.21.0":
+"strong-remoting@github:perkd/strong-remoting#semver:^3.21.0":
   version: 3.21.0
   resolution: "strong-remoting@https://github.com/perkd/strong-remoting.git#commit=f52caf8b5e029ac5b767614f53d99af0857374f6"
   dependencies:
@@ -3599,6 +3629,15 @@ __metadata:
   version: 1.0.2
   resolution: "util-deprecate@npm:1.0.2"
   checksum: 10/474acf1146cb2701fe3b074892217553dfcf9a031280919ba1b8d651a068c9b15d863b7303cb15bd00a862b498e6cf4ad7b4a08fb134edd5a6f7641681cb54a2
+  languageName: node
+  linkType: hard
+
+"uuid@npm:11.1.0":
+  version: 11.1.0
+  resolution: "uuid@npm:11.1.0"
+  bin:
+    uuid: dist/esm/bin/uuid
+  checksum: 10/d2da43b49b154d154574891ced66d0c83fc70caaad87e043400cf644423b067542d6f3eb641b7c819224a7cd3b4c2f21906acbedd6ec9c6a05887aa9115a9cf5
   languageName: node
   linkType: hard
 
