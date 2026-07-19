@@ -1,3 +1,13 @@
+# @perkd/loopback-connector-remote
+
+Formerly published as `loopback-connector-remote`.
+
+Published to GitHub Packages. Consumers typically alias:
+
+```bash
+yarn add loopback-connector-remote@npm:@perkd/loopback-connector-remote@^4.0.0
+```
+
 # loopback-connector-remote
 
 **THIS CONNECTOR DOES NOT SUPPORT LOOPBACK 4**
