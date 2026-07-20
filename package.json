@@ -1,6 +1,6 @@
 {
   "name": "@perkd/loopback-connector-remote",
-  "version": "4.0.0",
+  "version": "3.6.0",
   "description": "Remote REST API connector for Loopback",
   "author": "IBM Corp.",
   "main": "lib/remote-connector.js",
@@ -33,8 +33,8 @@
   },
   "homepage": "https://github.com/perkd/loopback-connector-remote#readme",
   "dependencies": {
-    "loopback-datasource-juggler": "npm:@perkd/loopback-datasource-juggler@^7.0.0",
-    "strong-remoting": "npm:@perkd/strong-remoting@^4.0.0"
+    "loopback-datasource-juggler": "npm:@perkd/loopback-datasource-juggler@^6.1.0",
+    "strong-remoting": "npm:@perkd/strong-remoting@^3.22.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
