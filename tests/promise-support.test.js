@@ -7,7 +7,7 @@
 
 const {describe, it, before, after} = require('node:test');
 const assert = require('node:assert');
-const helper = require('../helper');
+const helper = require('./helper');
 
 let app, User;
 

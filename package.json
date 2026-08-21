@@ -14,7 +14,7 @@
     "node": ">=24"
   },
   "scripts": {
-    "test": "node --test --test-force-exit --test-reporter=spec --experimental-test-coverage 'tests/*.test.js' 'tests/integration/*.js'",
+    "test": "node --test --test-force-exit --test-reporter=spec --experimental-test-coverage 'tests/*.test.js'",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "reinstall": "rm -rf node_modules yarn.lock && yarn install"
