@@ -11,7 +11,7 @@
     "StrongLoop"
   ],
   "engines": {
-    "node": ">=22"
+    "node": ">=24"
   },
   "scripts": {
     "test": "node --test --test-force-exit --test-reporter=spec --experimental-test-coverage 'test/*.test.js' 'test/integration/*.js'",
@@ -38,12 +38,13 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "eslint": "^10.4.0",
-    "globals": "^17.6.0",
-    "sinon": "^22.0.0",
+    "eslint": "^10.8.1",
+    "globals": "^17.11.0",
+    "loopback": "github:perkd/loopback#semver:^3.36.1",
+    "loopback-connector-remote": "portal:.",
+    "sinon": "^22.1.0",
     "strong-task-emitter": "^0.0.8"
   },
-  "packageManager": "yarn@4.17.0",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",
     "access": "restricted"
@@ -52,5 +53,6 @@
     "index.js",
     "lib",
     "README.md"
-  ]
+  ],
+  "packageManager": "yarn@4.18.0"
 }
