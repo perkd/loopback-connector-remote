@@ -127,7 +127,7 @@ __metadata:
   resolution: "@perkd/loopback-connector-remote@workspace:."
   dependencies:
     "@eslint/js": "npm:^10.0.1"
-    "@perkd/release": "npm:0.1.5"
+    "@perkd/release": "npm:0.1.7"
     eslint: "npm:^10.8.1"
     globals: "npm:^17.11.0"
     loopback: "github:perkd/loopback#semver:^3.36.1"
@@ -139,12 +139,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@perkd/release@npm:0.1.5":
-  version: 0.1.5
-  resolution: "@perkd/release@npm:0.1.5::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40perkd%2Frelease%2F0.1.5%2F65d5b7c45a1aa915bf45d7b006291403ab26543e"
+"@perkd/release@npm:0.1.7":
+  version: 0.1.7
+  resolution: "@perkd/release@npm:0.1.7::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40perkd%2Frelease%2F0.1.7%2F10579abc1f1f7466f12fc4d1ec0184a991fd4c19"
   bin:
     perkd-release: ./bin/perkd-release.mjs
-  checksum: 10c0/6713eebcb4e903b463cfc1cb7c052a52b9bc885f133c3e24c645ca6c57a2ec27ff16fb85628567ec6abf1255aff4793a97dae5555fec5fad9769bd590d3707c5
+  checksum: 10c0/59e1ebe0d277b048a9bfc593a23a854973a4f408d7bf901985ce4194a0e31a9aed1e17f830317a84c561ff5353176ecd4ce9008fa1ce9d93cbb142f9788ea38e
   languageName: node
   linkType: hard
 
