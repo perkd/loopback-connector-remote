@@ -17,7 +17,9 @@
     "test": "node --test --test-force-exit --test-reporter=spec --experimental-test-coverage 'tests/*.test.js'",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "reinstall": "rm -rf node_modules yarn.lock && yarn install"
+    "reinstall": "rm -rf node_modules yarn.lock && yarn install",
+    "release": "perkd-release release",
+    "release:publish": "perkd-release publish"
   },
   "repository": {
     "type": "git",
@@ -38,6 +40,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@perkd/release": "0.1.5",
     "eslint": "^10.8.1",
     "globals": "^17.11.0",
     "loopback": "github:perkd/loopback#semver:^3.36.1",
